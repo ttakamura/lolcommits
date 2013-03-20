@@ -272,6 +272,11 @@ Choice.options do
     desc "pass font file location"
   end
 
+  option :async do
+    long "--async"
+    short "-a"
+    desc "Fork the process before to capture"
+  end
 end
 
 # Set debug level if needed
@@ -291,7 +296,11 @@ die_on_fatal_conditions!
 #
 if not (Choice.choices[:enable] || Choice.choices[:disable])
   if Choice.choices[:capture]
-    do_capture()
+    if Choice.choices[:async]
+      fork { do_capture() }
+    else
+      do_capture()
+    end
   elsif Choice.choices[:configure]
     do_configure()
   elsif Choice.choices[:show_config]
